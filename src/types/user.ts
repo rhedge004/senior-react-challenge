@@ -29,5 +29,11 @@ export interface UserListResponse {
   total: number | null;
   skip: number;
   limit: number;
-  
+}
+
+export interface GetUsersParams {
+  limit: number;
+  skip: number;
+  searchTerm?: string;
+  genderFilter?: Gender | 'All'; 
 }

@@ -1,6 +1,6 @@
 'use client'; 
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useUsers } from '@/hooks/useUsers';
 import { User } from '@/types/user';
 import { Input } from '@/components/common/Input';
@@ -61,7 +61,7 @@ export default function UsersAdminPage() {
   if (isError) {
     return (
       <div className="p-6 max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6">Senior React Challenge - Users Admin</h1>
+        <h1 className="text-3xl font-bold mb-6">Users Admin</h1>
         <div className="p-4 bg-red-100 border border-red-400 text-red-700 rounded" role="alert">
           <p className="font-bold">Error fetching data:</p>
           <p>{error?.message || 'An unknown error occurred.'}</p>
@@ -76,7 +76,6 @@ export default function UsersAdminPage() {
 
   const isSearchActive = searchTerm.trim().length > 0;
   const showNoResults = filteredUsers.length === 0 && !isFetching && !isLoading;
-
   return (
     <div className="p-6 max-w-6xl mx-auto">
       <h1 className="text-3xl font-bold mb-6">Users</h1>
@@ -97,7 +96,7 @@ export default function UsersAdminPage() {
               onClick={() => setGenderFilter(filter as 'All' | 'male' | 'female')}
               className={`p-2 border ${genderFilter === filter ? 'bg-blue-500 text-white hover:bg-blue-500' : 'bg-gray-400'}`}
             >
-              {filter}
+              {filter.charAt(0).toUpperCase() + filter.slice(1)}
             </Button>
           ))}
         </div>
