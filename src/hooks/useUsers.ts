@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { getUsers, GetUsersParams } from '@/api/users';
-import { Gender, UserListResponse } from '@/types/user';
+import { getUsers } from '@/api/users';
+import { Gender, GetUsersParams, UserListResponse } from '@/types/user';
 import { useDebounce } from './useDebounce'; 
 import { ApiError } from '@/types/api'; 
 
@@ -36,9 +36,14 @@ export const useUsers = (): UseUsersResult => {
     setCurrentPage(1); 
   };
 
+  const handleSetGenderFilter = (filter: Gender | 'All') => {
+    setGenderFilter(filter);
+    setCurrentPage(1); 
+  };
+
   const skip = (currentPage - 1) * PAGE_SIZE;
   
-  const queryKey = ['users', { skip, limit: PAGE_SIZE, search: debouncedSearchTerm }];
+  const queryKey = ['users', { skip, limit: PAGE_SIZE, search: debouncedSearchTerm, gender: genderFilter }];
 
   const params: GetUsersParams = {
     limit: PAGE_SIZE,
@@ -86,7 +91,7 @@ export const useUsers = (): UseUsersResult => {
     searchTerm,
     genderFilter,
     setSearchTerm: handleSetSearchTerm,
-    setGenderFilter,
+    setGenderFilter: handleSetGenderFilter,
     goToNextPage,
     goToPrevPage,
     refetch: () => refetch(),

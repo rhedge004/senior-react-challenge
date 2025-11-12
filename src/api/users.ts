@@ -1,15 +1,8 @@
 import { apiFetch } from './api-client';
-import { UserListResponse, User, Gender } from '@/types/user';
-
-export interface GetUsersParams {
-  limit: number;
-  skip: number;
-  searchTerm?: string;
-  genderFilter?: Gender | 'All'; 
-}
+import { UserListResponse, User, GetUsersParams } from '@/types/user';
 
 export async function getUsers(params: GetUsersParams): Promise<UserListResponse> {
-  const { limit, skip, searchTerm } = params;
+  const { limit, skip, searchTerm, genderFilter } = params;
 
   let endpoint: string;
   const fetchParams: Record<string, string | number> = {
@@ -20,7 +13,13 @@ export async function getUsers(params: GetUsersParams): Promise<UserListResponse
   if (searchTerm && searchTerm.trim() !== '') {
     endpoint = '/users/search';
     fetchParams.q = searchTerm.trim();
-  } else {
+  } 
+  else if (genderFilter && genderFilter !== 'All') {
+    endpoint = '/users/filter';
+    fetchParams.key = 'gender';
+    fetchParams.value = genderFilter;
+  } 
+  else {
     endpoint = '/users';
   }
 
