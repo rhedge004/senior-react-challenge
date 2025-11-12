@@ -1,10 +1,9 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { getUsers, GetUsersParams } from '@/api/users';
 import { Gender, UserListResponse } from '@/types/user';
-
 import { useDebounce } from './useDebounce'; 
-import { ApiError } from 'next/dist/server/api-utils';
+import { ApiError } from '@/types/api'; 
 
 const PAGE_SIZE = 10;
 
@@ -17,7 +16,7 @@ interface UseUsersResult {
   currentPage: number;
   searchTerm: string;
   genderFilter: Gender | 'All';
-  setSearchTerm: (term: string) => void;
+  setSearchTerm: (term: string) => void; 
   setGenderFilter: (filter: Gender | 'All') => void;
   goToNextPage: () => void;
   goToPrevPage: () => void;
@@ -32,6 +31,11 @@ export const useUsers = (): UseUsersResult => {
   
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
 
+  const handleSetSearchTerm = (term: string) => {
+    setSearchTerm(term);
+    setCurrentPage(1); 
+  };
+
   const skip = (currentPage - 1) * PAGE_SIZE;
   
   const queryKey = ['users', { skip, limit: PAGE_SIZE, search: debouncedSearchTerm }];
@@ -43,23 +47,21 @@ export const useUsers = (): UseUsersResult => {
     genderFilter: genderFilter,
   };
 
-  const { data, isLoading, isError, error, isFetching, refetch } = useQuery<
-    UserListResponse,
-    ApiError
-  >({
+  const { 
+    data, 
+    isLoading, 
+    isError, 
+    error, 
+    isFetching, 
+    refetch 
+  } = useQuery<UserListResponse, ApiError>({
     queryKey: queryKey,
     queryFn: () => getUsers(params),
     staleTime: 1000 * 60 * 5, 
-    onSuccess: (responseData) => {
-      if (debouncedSearchTerm) {
-        if (data.skip !== skip) {
-           setCurrentPage(1);
-        }
-      }
-    }
   });
 
-  const totalPages = data ? Math.ceil(data.total / PAGE_SIZE) : 0;
+  const totalUsers = data?.total ?? 0;
+  const totalPages = data ? Math.ceil(totalUsers / PAGE_SIZE) : 0;
   
   const goToNextPage = () => {
     if (currentPage < totalPages) {
@@ -73,20 +75,17 @@ export const useUsers = (): UseUsersResult => {
     }
   };
 
-  useMemo(() => {
-    setCurrentPage(1);
-  }, [debouncedSearchTerm]);
 
   return {
     data,
-    isLoading: isLoading && isFetching && currentPage === 1, 
+    isLoading: isLoading && !isFetching, 
     isError,
     error,
     isFetching,
     currentPage,
     searchTerm,
     genderFilter,
-    setSearchTerm,
+    setSearchTerm: handleSetSearchTerm,
     setGenderFilter,
     goToNextPage,
     goToPrevPage,
