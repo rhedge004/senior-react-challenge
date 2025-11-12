@@ -61,7 +61,6 @@ export const UserDetailsDrawer: React.FC<UserDetailsDrawerProps> = ({
           </h2>
           <Button 
             onClick={onClose} 
-            className="p-1 bg-transparent hover:bg-gray-100 text-gray-500"
             aria-label="Close user details"
           >
             &times;

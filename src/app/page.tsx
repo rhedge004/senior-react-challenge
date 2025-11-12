@@ -106,12 +106,12 @@ export default function UsersAdminPage() {
           className="flex-grow"
         />
         
-        <div role="group" aria-label="Gender filter">
+        <div role="group" className='flex gap-1' aria-label="Gender filter">
           {['All', 'male', 'female'].map((filter) => (
             <Button
               key={filter}
               onClick={() => setGenderFilter(filter as 'All' | 'male' | 'female')}
-              className={`p-2 border ${genderFilter === filter ? 'bg-blue-500 text-white' : 'bg-gray-100'}`}
+              className={`p-2 border ${genderFilter === filter ? 'bg-blue-500 text-white' : 'bg-gray-400'}`}
             >
               {filter}
             </Button>
