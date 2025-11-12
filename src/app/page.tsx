@@ -9,7 +9,6 @@ import { Pagination } from '@/components/common/Pagination';
 import { UserList } from '@/components/UserList';
 import { UserDetailsDrawer } from '@/components/UserDetailsDrawer';
 
-
 export default function UsersAdminPage() {
   const {
     data,
@@ -41,10 +40,18 @@ export default function UsersAdminPage() {
     setTimeout(() => setSelectedUser(null), 300); 
   };
   
+  const users = data?.users || [];
+  const total = data?.total ?? 0; 
+  
+  const filteredUsers = 
+    genderFilter === 'All'
+      ? users
+      : users.filter(user => user.gender === genderFilter);
+
 
   if (isLoading && !isFetching) {
     return (
-      <div className="flex justify-center items-center h-screen text-xl">
+      <div className="flex justify-center items-center h-screen flex-col">
         <div className="loader mb-4"></div>
         <p className="text-xl text-gray-700">Loading Users...</p>
       </div>
@@ -54,11 +61,11 @@ export default function UsersAdminPage() {
   if (isError) {
     return (
       <div className="p-6 max-w-4xl mx-auto">
-        <h1 className="text-2xl font-bold mb-4">Users Admin</h1>
+        <h1 className="text-3xl font-bold mb-6">Senior React Challenge - Users Admin</h1>
         <div className="p-4 bg-red-100 border border-red-400 text-red-700 rounded" role="alert">
           <p className="font-bold">Error fetching data:</p>
           <p>{error?.message || 'An unknown error occurred.'}</p>
-          <Button onClick={refetch} className="mt-4 bg-red-600 hover:bg-red-700 text-white">
+          <Button onClick={refetch} className="mt-4">
             Retry Fetch
           </Button>
         </div>
@@ -66,32 +73,9 @@ export default function UsersAdminPage() {
     );
   }
 
-  const users = data?.users || [];
-  const total = data?.total || 0;
-  
-  const filteredUsers = 
-    genderFilter === 'All'
-      ? users
-      : users.filter(user => user.gender === genderFilter);
 
   const isSearchActive = searchTerm.trim().length > 0;
-  if (filteredUsers.length === 0 && !isFetching && !isLoading && total === 0) {
-    return (
-      <div className="p-6 max-w-4xl mx-auto">
-        <h1 className="text-2xl font-bold mb-4">Users Admin</h1>
-        {isSearchActive ? (
-          <div className="text-center p-10 border rounded">
-            No results found for &quot;{searchTerm}&quot;. Please try a different search term.
-          </div>
-        ) : (
-          <div className="text-center p-10 border rounded">
-            No users available.
-          </div>
-        )}
-      </div>
-    );
-  }
-
+  const showNoResults = filteredUsers.length === 0 && !isFetching && !isLoading;
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
@@ -101,17 +85,17 @@ export default function UsersAdminPage() {
         <Input
           placeholder="Search by name or email..."
           value={searchTerm}
-          onChange={(e: { target: { value: string; }; }) => setSearchTerm(e.target.value)}
+          onChange={(e) => setSearchTerm(e.target.value)}
           aria-label="Search users"
           className="flex-grow"
         />
         
-        <div role="group" className='flex gap-1' aria-label="Gender filter">
+        <div role="group" aria-label="Gender filter" className="flex">
           {['All', 'male', 'female'].map((filter) => (
             <Button
               key={filter}
               onClick={() => setGenderFilter(filter as 'All' | 'male' | 'female')}
-              className={`p-2 border ${genderFilter === filter ? 'bg-blue-500 text-white' : 'bg-gray-400'}`}
+              className={`p-2 border ${genderFilter === filter ? 'bg-blue-500 text-white hover:bg-blue-500' : 'bg-gray-400'}`}
             >
               {filter}
             </Button>
@@ -119,31 +103,44 @@ export default function UsersAdminPage() {
         </div>
       </div>
       
-      <div className="relative">
-        <UserList 
-          users={filteredUsers} 
-          onUserClick={handleUserClick} 
-        />
-        
-        {isFetching && (
-          <div className="absolute inset-0 bg-white bg-opacity-70 flex justify-center items-center">
-            <div className="loader mb-4"></div>
+      {showNoResults ? (
+        <div className="text-center p-10 border rounded my-6">
+          {isSearchActive ? (
+            <p className="font-semibold">No results found for &quot;{searchTerm}&quot;.</p>
+          ) : (
+            <p className="font-semibold">No users available.</p>
+          )}
+          <p className="text-gray-600">Try modifying your search term or filter.</p>
+        </div>
+      ) : (
+        <>
+          <div className="relative">
+            <UserList 
+              users={filteredUsers} 
+              onUserClick={handleUserClick} 
+            />
+            
+            {isFetching && (
+              <div className="absolute inset-0 bg-white bg-opacity-70 flex justify-center items-center flex-col">
+                <div className="loader"></div>
+              </div>
+            )}
           </div>
-        )}
-      </div>
 
-      <div className="mt-6 flex justify-between items-center">
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onNext={goToNextPage}
-          onPrev={goToPrevPage}
-          totalItems={total}
-        />
-        <p className="text-sm text-gray-600">
-            Showing page {currentPage} of {totalPages} total pages. ({total} total users)
-        </p>
-      </div>
+          <div className="mt-6 flex justify-between items-center">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onNext={goToNextPage}
+              onPrev={goToPrevPage}
+              totalItems={total}
+            />
+            <p className="text-sm text-gray-600">
+                Showing page {currentPage} of {totalPages} total pages. ({total} total users)
+            </p>
+          </div>
+        </>
+      )}
 
       <UserDetailsDrawer
         user={selectedUser}

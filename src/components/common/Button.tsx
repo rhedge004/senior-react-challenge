@@ -14,7 +14,7 @@ export const Button: React.FC<ButtonProps> = ({
   
   const disabledClasses = disabled 
     ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-    : 'bg-blue-500 hover:bg-blue-600 text-white shadow-md';
+    : 'bg-blue-500 hover:bg-blue-600 text-white';
 
   return (
     <button
