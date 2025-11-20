@@ -2,10 +2,13 @@
   "name": "senior-react-challenge",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://rhedge004.github.io/senior-react-challenge",
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
+    "predeploy": "npm run build && touch out/.nojekyll", 
+    "deploy": "gh-pages -d out --nojekyll",
     "lint": "eslint"
   },
   "dependencies": {
