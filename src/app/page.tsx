@@ -63,7 +63,7 @@ export default function UsersAdminPage() {
   if (isError) {
     return (
       <div className="p-6 max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6">Users Admin</h1>
+        <h1 className="text-3xl font-bold mb-6">Users</h1>
         <div
           className="p-4 bg-red-100 border border-red-400 text-red-700 rounded"
           role="alert"
